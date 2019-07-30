@@ -4,7 +4,7 @@
 
 This repo cantains the training code used during Visual Similarity research at [Fynd](https://www.fynd.com/). One can easily reproduce our state of the art models [MILDNet](https://arxiv.org/abs/1903.00905) and [Ranknet](https://arxiv.org/abs/1901.03546) and 2 other research works from the past. 25 configs are present which constitutes configurations of most critical experiments by us.
 
-For more details, refer to the **[Colab Notebook](https://colab.research.google.com/github/gofynd/mildnet/blob/master/MILDNet_on_Colab.ipynb) (execute training on Free GPUs or TPUs provided by Google in just 2 clicks)** or head to our research papers on Arxiv:
+For more details, refer to the **[Colab Notebook](https://colab.research.google.com/github/samehraban/mildnet/blob/master/MILDNet_on_Colab.ipynb) (execute training on Free GPUs or TPUs provided by Google in just 2 clicks)** or head to our research papers on Arxiv:
 - [MILDNet: A Lightweight Single Scaled Deep Ranking Architecture](https://arxiv.org/abs/1903.00905)
 - [Retrieving Similar E-Commerce Images Using Deep Learning](https://arxiv.org/abs/1901.03546)
 

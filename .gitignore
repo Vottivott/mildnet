@@ -6,3 +6,4 @@ trainer/.DS_Store
 .idea/
 dataset/
 output/
+.ipynb_checkpoints/
