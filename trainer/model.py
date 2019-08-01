@@ -73,7 +73,7 @@ def mildnet_vgg16():
   first_input = Input(shape=(224,224,3))
   second_input = Input(shape=(224,224,3))
 
-  final_model = tf.keras.models.Model(inputs=[first_input, second_input, vgg_model.input], outputs=convnet_output)
+  final_model = tf.keras.models.Model(inputs=vgg_model.input, outputs=convnet_output)
 
   return final_model
 
