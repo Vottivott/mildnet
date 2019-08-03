@@ -18,6 +18,7 @@ from functools import partial
 import logging
 
 import tensorflow.keras.backend as K
+from keras.preprocessing.image.iterator import Iterator as ImageIterator
 
 try:
     from PIL import Image as pil_image
@@ -662,7 +663,7 @@ class ImageDataGeneratorCustom(object):
             self.principal_components = np.dot(np.dot(u, np.diag(1. / np.sqrt(s + self.zca_epsilon))), u.T)
 
 
-class Iterator(object):
+class Iterator(ImageIterator):
     """Abstract base class for image data iterators.
     # Arguments
         n: Integer, total number of samples in the dataset to loop over.
@@ -671,7 +672,11 @@ class Iterator(object):
         seed: Random seeding for data shuffling.
     """
 
-    def __init__(self, batch_size, shuffle, seed, triplet_path):
+    def __init__(self,
+                 batch_size,
+                 shuffle,
+                 seed,
+                 triplet_path):
         count = 0
         f = open(triplet_path)
         f_read = f.read()
@@ -692,39 +697,46 @@ class Iterator(object):
         self.n = count * 3
 
         self.batch_size = batch_size
+        self.seed = seed
         self.shuffle = shuffle
         self.batch_index = 0
         self.total_batches_seen = 0
         self.lock = threading.Lock()
-        self.index_generator = self._flow_index(self.n, batch_size, shuffle, seed)
+        self.index_generator = self._flow_index()
 
     def reset(self):
         self.batch_index = 0
 
-    def _flow_index(self, n, batch_size=32, shuffle=False, seed=None):
+    def _set_index_array(self):
+        self.index_array = np.arange(self.n)
+        if self.shuffle:
+            self.index_array = np.random.permutation(self.n)
+
+    def _flow_index(self):
         # Ensure self.batch_index is 0.
         self.reset()
 
         while 1:
-            if seed is not None:
-                np.random.seed(seed + self.total_batches_seen)
+            if self.seed is not None:
+                np.random.seed(self.seed + self.total_batches_seen)
             if self.batch_index == 0:
-                index_array = np.arange(n)
-                if shuffle:
-                    index_array = np.random.permutation(n)
+                self._set_index_array()
 
-            current_index = (self.batch_index * batch_size) % n
+            if self.n == 0:
+                current_index = 0
+            else:
+                current_index = (self.batch_index * self.batch_size) % self.n
 
-            if n > current_index + batch_size:
-                current_batch_size = batch_size
+            if self.n > current_index + self.batch_size:
+                current_batch_size = self.batch_size
                 self.batch_index += 1
             else:
-                current_batch_size = n - current_index
+                current_batch_size = self.n - current_index
                 self.batch_index = 0
             self.total_batches_seen += 1
-            if current_batch_size!=batch_size:
-                logging.info("Batch size mismatch: {} != {}".format(current_batch_size, batch_size))
-            yield (index_array[current_index: current_index + current_batch_size],
+            if current_batch_size!=self.batch_size:
+                logging.info("Batch size mismatch: {} != {}".format(current_batch_size, self.batch_size))
+            yield (self.index_array[current_index: current_index + current_batch_size],
                    current_index, current_batch_size)
 
     def __iter__(self):
@@ -734,6 +746,12 @@ class Iterator(object):
 
     def __next__(self, *args, **kwargs):
         return self.next(*args, **kwargs)
+
+    def __getitem__(self, idx):
+        raise NotImplementedError
+
+    def __le__(self, other):
+        raise NotImplementedError
 
 
 class NumpyArrayIterator(Iterator):
