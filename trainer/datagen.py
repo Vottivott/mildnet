@@ -18,7 +18,7 @@ from functools import partial
 import logging
 
 import tensorflow.keras.backend as K
-from keras.preprocessing.image.iterator import Iterator as ImageIterator
+from keras.preprocessing.image import Iterator as ImageIterator
 
 try:
     from PIL import Image as pil_image
