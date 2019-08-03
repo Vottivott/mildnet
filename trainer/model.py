@@ -70,9 +70,6 @@ def mildnet_vgg16():
   convnet_output = Dense(2048, activation='relu')(convnet_output)
   convnet_output = Lambda(lambda  x: K.l2_normalize(x,axis=1))(convnet_output)
     
-  first_input = Input(shape=(224,224,3))
-  second_input = Input(shape=(224,224,3))
-
   final_model = tf.keras.models.Model(inputs=vgg_model.input, outputs=convnet_output)
 
   return final_model
