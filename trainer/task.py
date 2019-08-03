@@ -73,6 +73,13 @@ def main(job_dir, data_path, model_id, weights_path, loss, train_csv, val_csv, b
     exp.param("trainable_count", trainable_count)
     exp.param("non_trainable_count", non_trainable_count)
 
+
+  print('***********')
+  print('data_path: ' + data_path)
+  print('train_csv: ', train_csv)
+  print('valid_csv: ', val_csv)
+  print('***********')
+
   dg = DataGenerator({
     "rescale": 1. / 255,
     "horizontal_flip": True,
