@@ -30,7 +30,7 @@ class DataGenerator(object):
         self.params = params
         self.target_size = target_size
         triplet_path = triplet_path = "dataset/" + val_csv
-        self.train_idg = MildImageDataGenerator(triplet_path, **params.extend())
+        self.train_idg = MildImageDataGenerator(triplet_path, **params)
         self.test_idg = MildImageDataGenerator(triplet_path)
         self.data_path = data_path
         if not self.data_path.endswith('/'):
