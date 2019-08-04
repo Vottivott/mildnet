@@ -1,14 +1,14 @@
-[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/retrieving-similar-e-commerce-images-using/image-retrieval-street2shop-topwear)](https://paperswithcode.com/sota/image-retrieval-street2shop-topwear?p=retrieving-similar-e-commerce-images-using)     [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/mildnet-a-lightweight-single-scaled-deep/image-retrieval-street2shop-topwear)](https://paperswithcode.com/sota/image-retrieval-street2shop-topwear?p=mildnet-a-lightweight-single-scaled-deep)
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/retrieving-similar-e-commerce-images-using/image-retrieval-street2shop-topwear)](https://paperswithcode.com/sota/image-retrieval-street2shop-topwear?p=retrieving-similar-e-commerce-images-using)     [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/Mildnet-a-lightweight-single-scaled-deep/image-retrieval-street2shop-topwear)](https://paperswithcode.com/sota/image-retrieval-street2shop-topwear?p=Mildnet-a-lightweight-single-scaled-deep)
 
-# MILDNet
+# MildNet
 
-This repo cantains the training code used during Visual Similarity research at [Fynd](https://www.fynd.com/). One can easily reproduce our state of the art models [MILDNet](https://arxiv.org/abs/1903.00905) and [Ranknet](https://arxiv.org/abs/1901.03546) and 2 other research works from the past. 25 configs are present which constitutes configurations of most critical experiments by us.
+This repo cantains the training code used during Visual Similarity research at [Fynd](https://www.fynd.com/). One can easily reproduce our state of the art models [MildNet](https://arxiv.org/abs/1903.00905) and [Ranknet](https://arxiv.org/abs/1901.03546) and 2 other research works from the past. 25 configs are present which constitutes configurations of most critical experiments by us.
 
-For more details, refer to the **[Colab Notebook](https://colab.research.google.com/github/samehraban/mildnet/blob/master/MILDNet_on_Colab.ipynb) (execute training on Free GPUs or TPUs provided by Google in just 2 clicks)** or head to our research papers on Arxiv:
-- [MILDNet: A Lightweight Single Scaled Deep Ranking Architecture](https://arxiv.org/abs/1903.00905)
+For more details, refer to the **[Colab Notebook](https://colab.research.google.com/github/samehraban/Mildnet/blob/master/MildNet_on_Colab.ipynb) (execute training on Free GPUs or TPUs provided by Google in just 2 clicks)** or head to our research papers on Arxiv:
+- [MildNet: A Lightweight Single Scaled Deep Ranking Architecture](https://arxiv.org/abs/1903.00905)
 - [Retrieving Similar E-Commerce Images Using Deep Learning](https://arxiv.org/abs/1901.03546)
 
-We have also open-sourced 8 of our top experiment results with weights [here](https://console.cloud.google.com/storage/browser/fynd-open-source/research/MILDNet/). To analyze and compare all the results  (**training**) head to [this Colab notebook](https://colab.research.google.com/drive/1u7mZCU6AYXATWVu-sc_xpzE4ZRtVoSt9). To get an idea on using any of our open-sourced models models to find n similar items (**inferencing**) from your entire dataset head to [this Colab notebook](https://colab.research.google.com/drive/1j1pTFA2vNizQJeWPYgwoQYvXUMtdJ2-n). 
+We have also open-sourced 8 of our top experiment results with weights [here](https://console.cloud.google.com/storage/browser/fynd-open-source/research/MildNet/). To analyze and compare all the results  (**training**) head to [this Colab notebook](https://colab.research.google.com/drive/1u7mZCU6AYXATWVu-sc_xpzE4ZRtVoSt9). To get an idea on using any of our open-sourced models models to find n similar items (**inferencing**) from your entire dataset head to [this Colab notebook](https://colab.research.google.com/drive/1j1pTFA2vNizQJeWPYgwoQYvXUMtdJ2-n). 
 
 ## Introduction
 Visual Recommendation is a crucial feature for any ecommerce platform. It gives the platform power of instantly suggesting similar looking products to what a user is browsing, thus capturing his/her immediate intent which could result in higher customer engagment (CTR) and hence the conversion.
@@ -17,17 +17,17 @@ The task of identifying similar products is not trivial as the details concerned
 
 The base of such a system is a CNN extracting key features from product images and returning a vector respresenting those features. When these embeddings for all the products are mapped on an n-dimensional space, it places similar products closer to non-similar items. The nearest neighbours are then the top most visual similar items. Below diagram gives a brief overview:
 
-![](https://storage.googleapis.com/ml_shared_bucket/MILDNet/doc_imgs/VS_Basic_Inference_Flow.jpg)
+![](https://storage.googleapis.com/ml_shared_bucket/MildNet/doc_imgs/VS_Basic_Inference_Flow.jpg)
 
 ## Repo Overview
 
 - [execute.py](execute.py): Execute this to run training locally or on Google Cloud ML Engine.
-- [MILDNet_on_Colab.ipynb](https://colab.research.google.com/github/gofynd/mildnet/blob/master/MILDNet_on_Colab.ipynb): Google Colaboratory notebook describes the task and contains training, exploration and inference code.
+- [MildNet_on_Colab.ipynb](https://colab.research.google.com/github/gofynd/Mildnet/blob/master/MildNet_on_Colab.ipynb): Google Colaboratory notebook describes the task and contains training, exploration and inference code.
 - [requirements-local-cpu.txt](requirements-local-cpu.txt)/[requirements-local-gpu.txt](requirements-local-gpu.txt): Requirement files **only** need to execute when running locally.
 - settings.cfg: Global configs to setup:
--- MILDNET_JOB_DIR (**mandatory**): Requires directory path to store training outputs. Either pass path of local directory or Google cloud storage (gs://.....)
--- MILDNET_REGION (**optional**): Only needed when running on ML Engine (e.g. us-east1)
--- MILDNET_DATA_PATH (**mandatory**): Path where training data is stored. Change only when using custom data.
+-- MildNET_JOB_DIR (**mandatory**): Requires directory path to store training outputs. Either pass path of local directory or Google cloud storage (gs://.....)
+-- MildNET_REGION (**optional**): Only needed when running on ML Engine (e.g. us-east1)
+-- MildNET_DATA_PATH (**mandatory**): Path where training data is stored. Change only when using custom data.
 -- HYPERDASH_KEY: Hyperdash is a nice tool to log system out or to track training metrics. One can easily monitor all the jobs running using their Android app or webpage.
 - [job_configs](job_configs): Contains 25 configs defines the basic job configs like the training model architecture, loss function, optimizer, number of epoch, learning rate etc.
 - [trainer](trainer): Contains all script needed for training.
@@ -40,10 +40,10 @@ We carried out various experiments to study the performace of 4 research works (
 - Visnet: Visnet Multiscale model with base convnet as VGG16 and 2 shallow networks. Without LRN2D layer from Caffe.
 - Visnet-LRN2D: Visnet Multiscale model with base convnet as VGG16 and 2 shallow networks. Contains LRN2D layer from Caffe.
 - RankNet: Multiscale model with base convnet as VGG19 and 2 shallow networks. Hinge Loss is used here.
-- MILDNet: Single VGG16 architecture with 4 skip connections
-- MILDNet-Contrastive: Single VGG16 architecture with 4 skip connections, uses contrastive loss.
-- MILDNet-512-No-Dropout: MILDNet: Single VGG16 architecture with 4 skip connections. Dropouts are not used after feature concatenation.
-- MILDNet-MobileNet: MILDNet: Single MobileNet architecture with 4 skip connections.
+- MildNet: Single VGG16 architecture with 4 skip connections
+- MildNet-Contrastive: Single VGG16 architecture with 4 skip connections, uses contrastive loss.
+- MildNet-512-No-Dropout: MildNet: Single VGG16 architecture with 4 skip connections. Dropouts are not used after feature concatenation.
+- MildNet-MobileNet: MildNet: Single MobileNet architecture with 4 skip connections.
 
 Based on this experiments, below is the list of all the configs available to try out:
 
@@ -52,39 +52,39 @@ Based on this experiments, below is the list of all the configs available to try
     - ranknet.cnf
     - vanila_vgg16.cnf
     - visnet.cnf
-    - mildnet.cnf
+    - Mildnet.cnf
     - visnet-lrn2d.cnf
 - Mildnet Ablation Study 
-    - mildnet_skip_3.cnf
-    - mildnet_skip_2.cnf
-    - mildnet_skip_4.cnf
-    - mildnet_skip_1.cnf
+    - Mildnet_skip_3.cnf
+    - Mildnet_skip_2.cnf
+    - Mildnet_skip_4.cnf
+    - Mildnet_skip_1.cnf
 - Mildnet Low Features 
-    - mildnet_512_512.cnf
-    - mildnet_1024_512.cnf
-    - mildnet_512_no_dropout.cnf
+    - Mildnet_512_512.cnf
+    - Mildnet_1024_512.cnf
+    - Mildnet_512_no_dropout.cnf
 - Mildnet Other Losses 
-    - mildnet_hinge_new.cnf
-    - mildnet_angular_2.cnf
-    - mildnet_contrastive.cnf
-    - mildnet_lossless.cnf
-    - mildnet_angular_1.cnf
+    - Mildnet_hinge_new.cnf
+    - Mildnet_angular_2.cnf
+    - Mildnet_contrastive.cnf
+    - Mildnet_lossless.cnf
+    - Mildnet_angular_1.cnf
 - Mildnet Other Variants 
-    - mildnet_without_skip_big.cnf
-    - mildnet_vgg19.cnf
-    - mildnet_vgg16_big.cnf
-    - mildnet_without_skip.cnf
-    - mildnet_mobilenet.cnf
-    - mildnet_all_trainable.cnf
-    - mildnet_cropped.cnf
+    - Mildnet_without_skip_big.cnf
+    - Mildnet_vgg19.cnf
+    - Mildnet_vgg16_big.cnf
+    - Mildnet_without_skip.cnf
+    - Mildnet_mobilenet.cnf
+    - Mildnet_all_trainable.cnf
+    - Mildnet_cropped.cnf
 
-**Note that mildnet_contrastive.cnf and the Default Models configs are the models compared in the research paper.**
+**Note that Mildnet_contrastive.cnf and the Default Models configs are the models compared in the research paper.**
 
 ## Training
 
 - [execute.py](execute.py): Single point entry for running training job on **local** or **Google Cloud ML Engine**. Asks user whether to run the training locally or on ML Engine. The user then need to select a config from a list of configs. Finally, the script executes [gcloud.local.run.keras.sh](gcloud.local.run.keras.sh) if user selects to run locally or [gcloud.remote.run.keras.sh](gcloud.remote.run.keras.sh) if user selects to run on Google Cloud ML Engine. **Make sure to setup [settings.cfg](settings.cfg) if running on ML Engine.**
 
-- [MILDNet_on_Colab.ipynb](https://colab.research.google.com/github/gofynd/mildnet/blob/master/MILDNet_on_Colab.ipynb): Google Colaboratory notebook, gives a brief introduction of the task. Also one can execute training in just 2 clicks: 
+- [MildNet_on_Colab.ipynb](https://colab.research.google.com/github/gofynd/Mildnet/blob/master/MildNet_on_Colab.ipynb): Google Colaboratory notebook, gives a brief introduction of the task. Also one can execute training in just 2 clicks: 
 -- 1. Open notebook on google colab. 
 -- 2. From menu select Runtime -> Run all
 
@@ -104,9 +104,9 @@ Install requirements:
   ```pip install -r requirements-local-gpu.txt```
 
 Set below configs in settings.cfg:
-- MILDNET_JOB_DIR=gs://....
-- MILDNET_REGION=us-east1
-- MILDNET_DATA_PATH=gs://fynd-open-source/research/MILDNet/
+- MildNET_JOB_DIR=gs://....
+- MildNET_REGION=us-east1
+- MildNET_DATA_PATH=gs://fynd-open-source/research/MildNet/
 - HYPERDASH_KEY=your_hyperdash_key
 
 ## Run Training on Custom Job Config
@@ -123,7 +123,7 @@ Set below configs in settings.cfg:
     </code></pre>
 
 - Check tensorboard of ongoing training using:
-    <pre><code>tensorboard --logdir=gs://fynd-open-source/research/MILDNet/top_jobs/{{job_name}} --port=8080
+    <pre><code>tensorboard --logdir=gs://fynd-open-source/research/MildNet/top_jobs/{{job_name}} --port=8080
     </code></pre>
     
 - Hyperdash: Either use [Hyperdash Website](https://hyperdash.io/dashboard/models) or [Android App](https://play.google.com/store/apps/details?id=com.hyperdash)/[iOS App](https://itunes.apple.com/us/app/hyperdash-machine-learning-monitoring/id1257582233) to monitor logs.
@@ -134,7 +134,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) and [CONDUCT.md](CONDUCT.md) for 
 
 ## Versioning
 
-Please see [HISTORY.md](HISTORY.md). For the versions available, see the [tags on this repository](https://github.com/gofynd/mildnet/tags). 
+Please see [HISTORY.md](HISTORY.md). For the versions available, see the [tags on this repository](https://github.com/gofynd/Mildnet/tags). 
 
 ## Authors
 

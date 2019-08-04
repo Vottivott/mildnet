@@ -1,4 +1,4 @@
-model_id="mildnet_vgg16_skip_3"
+model_id="Mildnet_vgg16_skip_3"
 loss="hinge_loss"
 optimizer="mo"
 train_csv="tops_train_shuffle.csv"

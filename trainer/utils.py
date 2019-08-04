@@ -1,9 +1,9 @@
 from tensorflow.python.lib.io import file_io
 import os
 import numpy as np
-from tensorflow.keras import backend as K
+from tensorflow.python.keras import backend as K
 import zipfile
-from .datagen import ImageDataGeneratorCustom
+from .datagen import MildImageDataGenerator
 import logging
 
 
@@ -29,7 +29,9 @@ class DataGenerator(object):
   def __init__(self, params, data_path, train_csv, val_csv, target_size=(224, 224)):
     self.params = params
     self.target_size = target_size
-    self.idg = ImageDataGeneratorCustom(**params)
+    triplet_path = triplet_path = "dataset/"+self.val_csv
+    self.train_idg = MildImageDataGenerator(triplet_path, **params.extend())
+    self.test_idg = MildImageDataGenerator(triplet_path)
     self.data_path = data_path
     if not self.data_path.endswith('/'):
         self.data_path += '/'
@@ -47,8 +49,7 @@ class DataGenerator(object):
           output_f.write(train_f.read())
     return self.idg.flow_from_directory("dataset/tops/",
                                         batch_size = batch_size,
-                                        target_size = self.target_size,shuffle=False,
-                                        triplet_path = "dataset/"+self.train_csv)
+                                        target_size = self.target_size,shuffle=False)
 
   def get_test_generator(self, batch_size):
     with file_io.FileIO(self.data_path + self.val_csv, mode='r') as val_f:
@@ -56,8 +57,8 @@ class DataGenerator(object):
         output_f.write(val_f.read())
     return self.idg.flow_from_directory("dataset/tops/",
                                         batch_size = batch_size,
-                                        target_size = self.target_size, shuffle=False,
-                                        triplet_path = "dataset/"+self.val_csv,
+                                        target_size = self.target_size,
+                                        shuffle=False,
                                         should_transform = False)
 
 

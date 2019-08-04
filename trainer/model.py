@@ -23,7 +23,7 @@ def vanila_vgg16():
   return final_model
 
 
-def mildnet_without_skip():
+def Mildnet_without_skip():
   vgg_model = VGG16(weights="imagenet", include_top=False, input_shape=(224,224,3))
   convnet_output = Dense(1024, activation='relu')(vgg_model.output)
   convnet_output = Dropout(0.6)(convnet_output)
@@ -38,7 +38,7 @@ def mildnet_without_skip():
   return final_model
 
 
-def mildnet_without_skip_big():
+def Mildnet_without_skip_big():
   vgg_model = VGG16(weights="imagenet", include_top=False, input_shape=(224,224,3))
   convnet_output = Dense(2048, activation='relu')(vgg_model.output)
   convnet_output = Dropout(0.6)(convnet_output)
@@ -53,7 +53,7 @@ def mildnet_without_skip_big():
   return final_model
 
 
-def mildnet_vgg16():
+def Mildnet_vgg16():
   vgg_model = VGG16(weights="imagenet", include_top=False, input_shape=(224,224,3))
   
   for layer in vgg_model.layers[:10]:
@@ -75,7 +75,7 @@ def mildnet_vgg16():
   return final_model
 
 
-def mildnet_vgg16_big():
+def Mildnet_vgg16_big():
     vgg_model = VGG16(weights="imagenet", include_top=False, input_shape=(224,224,3))
     
     for layer in vgg_model.layers[:10]:
@@ -113,7 +113,7 @@ def mildnet_vgg16_big():
     return final_model
 
 
-def mildnet_mobilenet():
+def Mildnet_mobilenet():
     vgg_model = MobileNet(weights=None, include_top=False, input_shape=(224,224,3))
     intermediate_layer_outputs = get_layers_output_by_name(vgg_model, ["conv_dw_1_relu", "conv_dw_2_relu", "conv_dw_4_relu", "conv_dw_6_relu", "conv_dw_12_relu"])
     convnet_output = GlobalAveragePooling2D()(vgg_model.output)
@@ -135,7 +135,7 @@ def mildnet_mobilenet():
     return final_model
 
 
-def mildnet_1024_512():
+def Mildnet_1024_512():
   vgg_model = VGG16(weights="imagenet", include_top=False, input_shape=(224,224,3))
   
   for layer in vgg_model.layers[:10]:
@@ -160,7 +160,7 @@ def mildnet_1024_512():
   return final_model
 
 
-def mildnet_512_512():
+def Mildnet_512_512():
   vgg_model = VGG16(weights="imagenet", include_top=False, input_shape=(224,224,3))
   
   for layer in vgg_model.layers[:10]:
@@ -185,7 +185,7 @@ def mildnet_512_512():
   return final_model
 
 
-def mildnet_512_no_dropout():
+def Mildnet_512_no_dropout():
   vgg_model = VGG16(weights="imagenet", include_top=False, input_shape=(224,224,3))
   
   for layer in vgg_model.layers[:10]:
@@ -209,7 +209,7 @@ def mildnet_512_no_dropout():
   return final_model
 
 
-def mildnet_vgg19():
+def Mildnet_vgg19():
   vgg_model = VGG19(weights="imagenet", include_top=False, input_shape=(224,224,3))
   
   for layer in vgg_model.layers[:10]:
@@ -234,7 +234,7 @@ def mildnet_vgg19():
   return final_model
 
 
-def mildnet_all_trainable():
+def Mildnet_all_trainable():
   vgg_model = VGG16(weights="imagenet", include_top=False, input_shape=(224,224,3))
   
   intermediate_layer_outputs = get_layers_output_by_name(vgg_model, ["block1_pool", "block2_pool", "block3_pool", "block4_pool"])
@@ -256,7 +256,7 @@ def mildnet_all_trainable():
   return final_model
 
 
-def mildnet_vgg16_skip_1():
+def Mildnet_vgg16_skip_1():
   vgg_model = VGG16(weights="imagenet", include_top=False, input_shape=(224,224,3))
   
   for layer in vgg_model.layers[:10]:
@@ -281,7 +281,7 @@ def mildnet_vgg16_skip_1():
   return final_model
 
 
-def mildnet_vgg16_skip_2():
+def Mildnet_vgg16_skip_2():
   vgg_model = VGG16(weights="imagenet", include_top=False, input_shape=(224,224,3))
   
   for layer in vgg_model.layers[:10]:
@@ -306,7 +306,7 @@ def mildnet_vgg16_skip_2():
   return final_model
 
 
-def mildnet_vgg16_skip_3():
+def Mildnet_vgg16_skip_3():
   vgg_model = VGG16(weights="imagenet", include_top=False, input_shape=(224,224,3))
   
   for layer in vgg_model.layers[:10]:
@@ -331,7 +331,7 @@ def mildnet_vgg16_skip_3():
   return final_model
 
 
-def mildnet_vgg16_skip_4():
+def Mildnet_vgg16_skip_4():
   vgg_model = VGG16(weights="imagenet", include_top=False, input_shape=(224,224,3))
   
   for layer in vgg_model.layers[:10]:
@@ -493,7 +493,7 @@ def visnet_model():
 def alexnet():
     if not os.path.exists("alexnet_keras.zip"):
         print("Downloading Alexnet Keras Helpers")
-        with file_io.FileIO("gs://fynd-open-source/research/MILDNet/alexnet_keras.zip", mode='r') as alexnet_keras:
+        with file_io.FileIO("gs://fynd-open-source/research/MildNet/alexnet_keras.zip", mode='r') as alexnet_keras:
             with file_io.FileIO("alexnet_keras.zip", mode='w+') as output_f:
                 output_f.write(alexnet_keras.read())
         dest_path = "/root/.local/lib/python2.7/site-packages/trainer"

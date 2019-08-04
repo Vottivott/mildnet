@@ -1,4 +1,4 @@
-model_id="mildnet_vgg16_big"
+model_id="Mildnet_vgg16_big"
 loss="hinge_loss"
 optimizer="rms"
 train_csv="tops_train_shuffle.csv"

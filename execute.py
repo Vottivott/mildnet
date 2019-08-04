@@ -21,7 +21,7 @@ def test_settings_config():
     for path in paths:
         os.environ[path.split("=")[0]]=path.split("=")[1].replace('"',"")
 
-    if not "MILDNET_JOB_DIR" in os.environ or not os.environ["MILDNET_JOB_DIR"]:
+    if not "MildNET_JOB_DIR" in os.environ or not os.environ["MildNET_JOB_DIR"]:
         print("Job directory is needed to set in settings.cfg")
         return False
     return True
@@ -66,9 +66,9 @@ def execute():
         print("\nCorrect config and re run")
     else:
         if env=="remote":
-            if not os.environ["MILDNET_JOB_DIR"].startswith("gs://"):
-                print("\nKindly set google cloud storage path for MILDNET_JOB_DIR config in settings.cfg")
-            existing_jobs = os.popen("gsutil ls {}".format(os.environ["MILDNET_JOB_DIR"])).read()
+            if not os.environ["MildNET_JOB_DIR"].startswith("gs://"):
+                print("\nKindly set google cloud storage path for MildNET_JOB_DIR config in settings.cfg")
+            existing_jobs = os.popen("gsutil ls {}".format(os.environ["MildNET_JOB_DIR"])).read()
             existing_jobs = [v.split("/")[-2] for v in existing_jobs.split("\n") if len(v)]
             new_job_name = "{}_1".format(selected_conf)
             while new_job_name in existing_jobs:

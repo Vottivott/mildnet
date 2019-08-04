@@ -1,4 +1,4 @@
-model_id="mildnet_vgg19"
+model_id="Mildnet_vgg19"
 loss="contrastive_loss"
 optimizer="mo"
 train_csv="tops_train_shuffle.csv"

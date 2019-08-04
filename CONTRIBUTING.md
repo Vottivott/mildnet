@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for your interest! MILDNet is always looking for contributors. If you
+Thank you for your interest! MildNet is always looking for contributors. If you
 don't feel comfortable contributing code, adding docstrings to the source files
 is very appreciated.
 

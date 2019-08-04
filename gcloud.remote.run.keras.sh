@@ -8,11 +8,11 @@ source $1
 gcloud ml-engine jobs submit training $2 \
 --module-name=trainer.task \
 --package-path=trainer/ \
---job-dir=$MILDNET_JOB_DIR$2 \
---region=$MILDNET_REGION \
+--job-dir=$MildNET_JOB_DIR$2 \
+--region=$MildNET_REGION \
 --config=$config \
 -- \
---data-path=$MILDNET_DATA_PATH \
+--data-path=$MildNET_DATA_PATH \
 --model-id=$model_id \
 --loss=$loss \
 --optimizer=$optimizer \

@@ -1,4 +1,4 @@
-model_id="mildnet_512_no_dropout"
+model_id="Mildnet_512_no_dropout"
 loss="hinge_loss"
 optimizer="mo"
 train_csv="tops_train_shuffle.csv"
