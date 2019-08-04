@@ -8,58 +8,57 @@ import logging
 
 
 def downloads_training_images(data_path, is_cropped=False):
-  if not os.path.exists("dataset/tops"):
-    if not os.path.exists("dataset"):
-        os.makedirs("dataset")
+    if not os.path.exists("dataset/tops"):
+        if not os.path.exists("dataset"):
+            os.makedirs("dataset")
 
-    images_zip_path = "tops.zip"
-    if is_cropped:
-      images_zip_path = "tops_cropped.zip"
+        images_zip_path = "tops.zip"
+        if is_cropped:
+            images_zip_path = "tops_cropped.zip"
 
-    with file_io.FileIO(data_path + images_zip_path, mode='r') as input_f:
-      with file_io.FileIO('dataset/tops.zip', mode='w+') as output_f:
-        output_f.write(input_f.read())
-    with zipfile.ZipFile("dataset/tops.zip", 'r') as zip_ref:
-      zip_ref.extractall("dataset")
-    if is_cropped:
-      os.rename("dataset/tops_cropped", "dataset/tops")
+        with file_io.FileIO(data_path + images_zip_path, mode='r') as input_f:
+            with file_io.FileIO('dataset/tops.zip', mode='w+') as output_f:
+                output_f.write(input_f.read())
+        with zipfile.ZipFile("dataset/tops.zip", 'r') as zip_ref:
+            zip_ref.extractall("dataset")
+        if is_cropped:
+            os.rename("dataset/tops_cropped", "dataset/tops")
 
 
 class DataGenerator(object):
-  def __init__(self, params, data_path, train_csv, val_csv, target_size=(224, 224)):
-    self.params = params
-    self.target_size = target_size
-    triplet_path = triplet_path = "dataset/"+self.val_csv
-    self.train_idg = MildImageDataGenerator(triplet_path, **params.extend())
-    self.test_idg = MildImageDataGenerator(triplet_path)
-    self.data_path = data_path
-    if not self.data_path.endswith('/'):
-        self.data_path += '/'
-    self.train_csv = train_csv
-    self.val_csv = val_csv
+    def __init__(self, params, data_path, train_csv, val_csv, target_size=(224, 224)):
+        self.params = params
+        self.target_size = target_size
+        triplet_path = triplet_path = "dataset/" + val_csv
+        self.train_idg = MildImageDataGenerator(triplet_path, **params.extend())
+        self.test_idg = MildImageDataGenerator(triplet_path)
+        self.data_path = data_path
+        if not self.data_path.endswith('/'):
+            self.data_path += '/'
+        self.train_csv = train_csv
+        self.val_csv = val_csv
 
-  def get_train_generator(self, batch_size, is_full_data = False):
-    with file_io.FileIO(self.data_path + self.train_csv, mode='r') as train_f:
-      if is_full_data:
-        with file_io.FileIO(self.data_path + self.train_csv, mode='r') as val_f:
-          with file_io.FileIO("dataset/"+self.train_csv, mode='w+') as output_f:
-            output_f.write(train_f.read()+"\n"+val_f.read())
-      else:
-        with file_io.FileIO("dataset/"+self.train_csv, mode='w+') as output_f:
-          output_f.write(train_f.read())
-    return self.idg.flow_from_directory("dataset/tops/",
-                                        batch_size = batch_size,
-                                        target_size = self.target_size,shuffle=False)
+    def get_train_generator(self, batch_size, is_full_data=False):
+        with file_io.FileIO(self.data_path + self.train_csv, mode='r') as train_f:
+            if is_full_data:
+                with file_io.FileIO(self.data_path + self.train_csv, mode='r') as val_f:
+                    with file_io.FileIO("dataset/" + self.train_csv, mode='w+') as output_f:
+                        output_f.write(train_f.read() + "\n" + val_f.read())
+            else:
+                with file_io.FileIO("dataset/" + self.train_csv, mode='w+') as output_f:
+                    output_f.write(train_f.read())
+        return self.train_idg.flow_from_directory("dataset/tops/",
+                                            batch_size=batch_size,
+                                            target_size=self.target_size, shuffle=False)
 
-  def get_test_generator(self, batch_size):
-    with file_io.FileIO(self.data_path + self.val_csv, mode='r') as val_f:
-      with file_io.FileIO("dataset/"+self.val_csv, mode='w+') as output_f:
-        output_f.write(val_f.read())
-    return self.idg.flow_from_directory("dataset/tops/",
-                                        batch_size = batch_size,
-                                        target_size = self.target_size,
-                                        shuffle=False,
-                                        should_transform = False)
+    def get_test_generator(self, batch_size):
+        with file_io.FileIO(self.data_path + self.val_csv, mode='r') as val_f:
+            with file_io.FileIO("dataset/" + self.val_csv, mode='w+') as output_f:
+                output_f.write(val_f.read())
+        return self.test_idg.flow_from_directory("dataset/tops/",
+                                            batch_size=batch_size,
+                                            target_size=self.target_size,
+                                            shuffle=False)
 
 
 def get_layers_output_by_name(model, layer_names):
@@ -70,7 +69,7 @@ def backup_file(job_dir, filepath):
     if job_dir.startswith("gs://"):
         with file_io.FileIO(filepath, mode='r') as input_f:
             with file_io.FileIO(os.path.join(job_dir, filepath), mode='w+') as output_f:
-                 output_f.write(input_f.read())
+                output_f.write(input_f.read())
 
 
 def write_file_and_backup(content, job_dir, filepath):
