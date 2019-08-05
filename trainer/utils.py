@@ -29,9 +29,8 @@ class DataGenerator(object):
     def __init__(self, params, data_path, train_csv, val_csv, target_size=(224, 224)):
         self.params = params
         self.target_size = target_size
-        triplet_path = triplet_path = "dataset/" + val_csv
-        self.train_idg = MildImageDataGenerator(triplet_path, **params)
-        self.test_idg = MildImageDataGenerator(triplet_path)
+        self.train_idg = MildImageDataGenerator('dataset/' + train_csv, **params)
+        self.test_idg = MildImageDataGenerator('dataset/' + val_csv)
         self.data_path = data_path
         if not self.data_path.endswith('/'):
             self.data_path += '/'
@@ -48,17 +47,17 @@ class DataGenerator(object):
                 with file_io.FileIO("dataset/" + self.train_csv, mode='w+') as output_f:
                     output_f.write(train_f.read())
         return self.train_idg.flow_from_directory("dataset/tops/",
-                                            batch_size=batch_size,
-                                            target_size=self.target_size, shuffle=False)
+                                                  batch_size=batch_size,
+                                                  target_size=self.target_size, shuffle=False)
 
     def get_test_generator(self, batch_size):
         with file_io.FileIO(self.data_path + self.val_csv, mode='r') as val_f:
             with file_io.FileIO("dataset/" + self.val_csv, mode='w+') as output_f:
                 output_f.write(val_f.read())
         return self.test_idg.flow_from_directory("dataset/tops/",
-                                            batch_size=batch_size,
-                                            target_size=self.target_size,
-                                            shuffle=False)
+                                                 batch_size=batch_size,
+                                                 target_size=self.target_size,
+                                                 shuffle=False)
 
 
 def get_layers_output_by_name(model, layer_names):
