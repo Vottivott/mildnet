@@ -50,7 +50,7 @@ class MildBatchFromFilesMixin(BatchFromFilesMixin):
     def _get_batches_of_transformed_samples(self, index_array):
         # The transformation of images is not under thread lock
         # so it can be done in parallel
-        batch_x = np.zeros((len(index_array),) + self.image_shape, dtype=K.floatx())
+        batch_x = np.zeros((len(index_array),) + self.image_shape, dtype=self.dtype)
         grayscale = self.color_mode == 'grayscale'
         # build batch of image data
         filepaths = self.filepaths
