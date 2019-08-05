@@ -202,3 +202,15 @@ class MildDirectoryIterator(MildBatchFromFilesMixin, MildIterator):
                                                     shuffle,
                                                     seed,
                                                     self.image_data_generator.triplet_path)
+    @property
+    def filepaths(self):
+        return self._filepaths
+
+    @property
+    def labels(self):
+        return self.classes
+
+    @property  # mixin needs this property to work
+    def sample_weight(self):
+        # no sample weights will be returned
+        return None

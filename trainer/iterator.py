@@ -2,7 +2,7 @@ import logging
 
 from keras_preprocessing.image import Iterator
 from keras_preprocessing.image.iterator import BatchFromFilesMixin
-
+from keras_preprocessing.image.directory_iterator import DirectoryIterator
 
 class MildIterator(Iterator):
     """Abstract base class for image data iterators.
