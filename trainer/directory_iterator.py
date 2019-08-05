@@ -201,4 +201,5 @@ class MildDirectoryIterator(MildBatchFromFilesMixin, MildIterator):
         super(MildDirectoryIterator, self).__init__(batch_size,
                                                     shuffle,
                                                     seed,
-                                                    self.image_data_generator.triplet_path)
+                                                    self.image_data_generator.triplet_path,
+                                                    self.n)
