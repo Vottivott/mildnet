@@ -3,7 +3,7 @@ import os
 import numpy as np
 from tensorflow.python.keras import backend as K
 import zipfile
-from .datagen import MildImageDataGenerator
+from trainer.image.datagen import MildImageDataGenerator
 import logging
 
 

@@ -5,8 +5,8 @@ import warnings
 import numpy as np
 from tensorflow.python.keras.preprocessing.image import ImageDataGenerator
 
-from trainer.directory_iterator import MildDirectoryIterator
-from trainer.numpy_array_iterator import MildNumpyArrayIterator
+from trainer.image.directory_iterator import MildDirectoryIterator
+from trainer.image.numpy_array_iterator import MildNumpyArrayIterator
 
 try:
     from PIL import Image as pil_image

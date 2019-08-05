@@ -5,7 +5,7 @@ from functools import partial
 
 import numpy as np
 
-from trainer.iterator import MildBatchFromFilesMixin, MildIterator
+from trainer.image.iterator import MildBatchFromFilesMixin, MildIterator
 
 
 def _count_valid_files_in_directory(directory, white_list_formats, follow_links):

@@ -12,7 +12,7 @@ from .utils import *
 from .accuracy import *
 from time import time
 from tensorflow.python.lib.io import file_io
-from .datagen import MildImageDataGenerator
+from trainer.image.datagen import MildImageDataGenerator
 import logging
 
 

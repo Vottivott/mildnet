@@ -89,4 +89,5 @@ class MildBatchFromFilesMixin(BatchFromFilesMixin):
             #     batch_y[i, label] = 1.
         else:
             return batch_x
-        return [batch_x, batch_x, batch_x], batch_y
+        # return [batch_x, batch_x, batch_x], batch_y
+        return batch_x, batch_y

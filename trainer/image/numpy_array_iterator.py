@@ -4,7 +4,7 @@ import warnings
 import numpy as np
 from tensorflow.python.keras.preprocessing.image import array_to_img
 
-from trainer.iterator import MildIterator
+from trainer.image.iterator import MildIterator
 
 
 class MildNumpyArrayIterator(MildIterator):
