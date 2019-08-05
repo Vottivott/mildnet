@@ -18,9 +18,8 @@ class MildIterator(Iterator):
                  batch_size,
                  shuffle,
                  seed,
-                 triplet_path,
-                 n):
-        super().__init__(n, batch_size, shuffle, seed)
+                 triplet_path):
+        super().__init__(0, batch_size, shuffle, seed)
         count = 0
         f = open(triplet_path)
         f_read = f.read()
@@ -42,12 +41,6 @@ class MildIterator(Iterator):
         f.close()
         self.n = count * 3
 
-        self.batch_size = batch_size
-        self.seed = seed
-        self.shuffle = shuffle
-        self.batch_index = 0
-        self.total_batches_seen = 0
-        self.lock = threading.Lock()
         self.index_generator = self._flow_index()
 
 
