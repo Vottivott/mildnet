@@ -128,7 +128,6 @@ class MildDirectoryIterator(MildBatchFromFilesMixin, MildIterator):
                  image_data_generator,
                  target_size=(256, 256),
                  color_mode='rgb',
-                 classes=None,
                  class_mode='categorical',
                  batch_size=32,
                  shuffle=True,
@@ -151,7 +150,6 @@ class MildDirectoryIterator(MildBatchFromFilesMixin, MildIterator):
                                                                 subset,
                                                                 interpolation)
         self.directory = directory
-        self.classes = classes
         if class_mode not in self.allowed_class_modes:
             raise ValueError('Invalid class_mode:', class_mode,
                              '; expected one of "categorical", '
