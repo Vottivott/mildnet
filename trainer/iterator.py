@@ -1,5 +1,4 @@
 import logging
-import threading
 
 from keras_preprocessing.image import Iterator
 from keras_preprocessing.image.iterator import BatchFromFilesMixin
@@ -19,7 +18,7 @@ class MildIterator(Iterator):
                  shuffle,
                  seed,
                  triplet_path):
-        super().__init__(0, batch_size, shuffle, seed)
+        super(MildIterator, self).__init__(0, batch_size, shuffle, seed)
         count = 0
         f = open(triplet_path)
         f_read = f.read()
