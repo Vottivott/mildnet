@@ -68,7 +68,7 @@ def main(job_dir, data_path, model_id, weights_path, loss, train_csv, val_csv, b
         raise RuntimeError("Failed. Loss function {} not found".format(loss + "_fn"))
 
     accuracy = accuracy_fn(batch_size)
-    img_width, img_height = [int(v) for v in model.input[0].shape[1:3]]
+    img_width, img_height = [int(v) for v in model.input[0].shape[0:2]]
 
     trainable_count, non_trainable_count = print_trainable_counts(model)
 
