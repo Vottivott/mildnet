@@ -1,27 +1,22 @@
+import random
+
+from keras_applications.resnet50 import ResNet50
+from tensorflow.python.keras import backend as K
+from tensorflow.python.keras.applications.mobilenet import MobileNet
 from tensorflow.python.keras.applications.vgg16 import VGG16
 from tensorflow.python.keras.applications.vgg19 import VGG19
-from tensorflow.python.keras.applications.mobilenet import MobileNet
-from tensorflow.python.keras.layers import Dropout, Flatten, Dense, Input, MaxPool2D, GlobalAveragePooling2D, Lambda, \
+from tensorflow.python.keras.layers import Dropout, Flatten, Dense, MaxPool2D, GlobalAveragePooling2D, Lambda, \
     Conv2D, concatenate, ZeroPadding2D, Layer, MaxPooling2D
 from tensorflow.python.keras.models import Model
-from tensorflow.python.keras import backend as K
-from .utils import get_layers_output_by_name
-import random
+
 from .loss import *
-from tensorflow.python.lib.io import file_io
-import os
-import zipfile
+from .utils import get_layers_output_by_name
 
 
 def vanila_vgg16():
     vgg_model = VGG16(weights="imagenet", include_top=False, input_shape=(224, 224, 3))
 
-    first_input = Input(shape=(224, 224, 3))
-    second_input = Input(shape=(224, 224, 3))
-
-    final_model = tf.keras.models.Model(inputs=[first_input, second_input, vgg_model.input], outputs=vgg_model.output)
-
-    return final_model
+    return vgg_model
 
 
 def Mildnet_without_skip():
@@ -31,10 +26,7 @@ def Mildnet_without_skip():
     convnet_output = Dense(1024, activation='relu')(convnet_output)
     convnet_output = Lambda(lambda x: K.l2_normalize(x, axis=1))(convnet_output)
 
-    first_input = Input(shape=(224, 224, 3))
-    second_input = Input(shape=(224, 224, 3))
-
-    final_model = tf.keras.models.Model(inputs=[first_input, second_input, vgg_model.input], outputs=convnet_output)
+    final_model = tf.keras.models.Model(inputs=vgg_model.input, outputs=convnet_output)
 
     return final_model
 
@@ -46,10 +38,7 @@ def Mildnet_without_skip_big():
     convnet_output = Dense(2048, activation='relu')(convnet_output)
     convnet_output = Lambda(lambda x: K.l2_normalize(x, axis=1))(convnet_output)
 
-    first_input = Input(shape=(224, 224, 3))
-    second_input = Input(shape=(224, 224, 3))
-
-    final_model = tf.keras.models.Model(inputs=[first_input, second_input, vgg_model.input], outputs=convnet_output)
+    final_model = tf.keras.models.Model(inputs=vgg_model.input, outputs=convnet_output)
 
     return final_model
 
@@ -76,6 +65,26 @@ def Mildnet_vgg16():
 
     return final_model
 
+def Mildnet_resnet():
+    model = ResNet50(include_top=False, weights='imagenet', input_shape=(224, 224, 3), pooling='avg')
+
+    for layer in model.layers[:143]:
+        layer.trainable = False
+
+    intermediate_layer_outputs = get_layers_output_by_name(model, ['activation_46', 'activation_43'])
+    convnet_output = model.output
+    for layer_name, output in intermediate_layer_outputs.items():
+        output = GlobalAveragePooling2D()(output)
+        convnet_output = concatenate([convnet_output, output])
+
+    convnet_output = Dense(2048, activation='relu')(convnet_output)
+    convnet_output = Dropout(0.6)(convnet_output)
+    convnet_output = Dense(2048, activation='relu')(convnet_output)
+    convnet_output = Lambda(lambda x: K.l2_normalize(x, axis=1))(convnet_output)
+
+    final_model = tf.keras.models.Model(inputs=model.input, outputs=convnet_output)
+
+    return final_model
 
 def Mildnet_vgg16_big():
     vgg_model = VGG16(weights="imagenet", include_top=False, input_shape=(224, 224, 3))
@@ -95,14 +104,12 @@ def Mildnet_vgg16_big():
     convnet_output = Dense(2048, activation='relu')(convnet_output)
     convnet_output = Lambda(lambda x: K.l2_normalize(x, axis=1))(convnet_output)
 
-    first_input = Input(shape=(224, 224, 3))
-    first_conv = Conv2D(96, kernel_size=(8, 8), strides=(16, 16), padding='same')(first_input)
+    first_conv = Conv2D(96, kernel_size=(8, 8), strides=(16, 16), padding='same')(vgg_model.input)
     first_max = MaxPool2D(pool_size=(3, 3), strides=(4, 4), padding='same')(first_conv)
     first_max = Flatten()(first_max)
     first_max = Lambda(lambda x: K.l2_normalize(x, axis=1))(first_max)
 
-    second_input = Input(shape=(224, 224, 3))
-    second_conv = Conv2D(96, kernel_size=(8, 8), strides=(32, 32), padding='same')(second_input)
+    second_conv = Conv2D(96, kernel_size=(8, 8), strides=(32, 32), padding='same')(vgg_model.input)
     second_max = MaxPool2D(pool_size=(7, 7), strides=(2, 2), padding='same')(second_conv)
     second_max = Flatten()(second_max)
     second_max = Lambda(lambda x: K.l2_normalize(x, axis=1))(second_max)
@@ -111,7 +118,7 @@ def Mildnet_vgg16_big():
     merge_two = concatenate([merge_one, convnet_output], axis=1)
     emb = Dense(4096)(merge_two)
     l2_norm_final = Lambda(lambda x: K.l2_normalize(x, axis=1))(emb)
-    final_model = tf.keras.models.Model(inputs=[first_input, second_input, vgg_model.input], outputs=l2_norm_final)
+    final_model = tf.keras.models.Model(inputs=vgg_model.input, outputs=l2_norm_final)
 
     return final_model
 
@@ -132,10 +139,7 @@ def Mildnet_mobilenet():
     convnet_output = Dense(1024, activation='relu')(convnet_output)
     convnet_output = Lambda(lambda x: K.l2_normalize(x, axis=1))(convnet_output)
 
-    first_input = Input(shape=(224, 224, 3))
-    second_input = Input(shape=(224, 224, 3))
-
-    final_model = tf.keras.models.Model(inputs=[first_input, second_input, vgg_model.input], outputs=convnet_output)
+    final_model = tf.keras.models.Model(inputs=vgg_model.input, outputs=convnet_output)
 
     return final_model
 
@@ -158,10 +162,7 @@ def Mildnet_1024_512():
     convnet_output = Dense(512, activation='relu')(convnet_output)
     convnet_output = Lambda(lambda x: K.l2_normalize(x, axis=1))(convnet_output)
 
-    first_input = Input(shape=(224, 224, 3))
-    second_input = Input(shape=(224, 224, 3))
-
-    final_model = tf.keras.models.Model(inputs=[first_input, second_input, vgg_model.input], outputs=convnet_output)
+    final_model = tf.keras.models.Model(inputs=vgg_model.input, outputs=convnet_output)
 
     return final_model
 
@@ -184,10 +185,7 @@ def Mildnet_512_512():
     convnet_output = Dense(512, activation='relu')(convnet_output)
     convnet_output = Lambda(lambda x: K.l2_normalize(x, axis=1))(convnet_output)
 
-    first_input = Input(shape=(224, 224, 3))
-    second_input = Input(shape=(224, 224, 3))
-
-    final_model = tf.keras.models.Model(inputs=[first_input, second_input, vgg_model.input], outputs=convnet_output)
+    final_model = tf.keras.models.Model(inputs=vgg_model.input, outputs=convnet_output)
 
     return final_model
 
@@ -209,10 +207,7 @@ def Mildnet_512_no_dropout():
     convnet_output = Dense(512, activation='relu')(convnet_output)
     convnet_output = Lambda(lambda x: K.l2_normalize(x, axis=1))(convnet_output)
 
-    first_input = Input(shape=(224, 224, 3))
-    second_input = Input(shape=(224, 224, 3))
-
-    final_model = tf.keras.models.Model(inputs=[first_input, second_input, vgg_model.input], outputs=convnet_output)
+    final_model = tf.keras.models.Model(inputs=vgg_model.input, outputs=convnet_output)
 
     return final_model
 
@@ -235,10 +230,7 @@ def Mildnet_vgg19():
     convnet_output = Dense(2048, activation='relu')(convnet_output)
     convnet_output = Lambda(lambda x: K.l2_normalize(x, axis=1))(convnet_output)
 
-    first_input = Input(shape=(224, 224, 3))
-    second_input = Input(shape=(224, 224, 3))
-
-    final_model = tf.keras.models.Model(inputs=[first_input, second_input, vgg_model.input], outputs=convnet_output)
+    final_model = tf.keras.models.Model(inputs=vgg_model.input, outputs=convnet_output)
 
     return final_model
 
@@ -258,10 +250,7 @@ def Mildnet_all_trainable():
     convnet_output = Dense(2048, activation='relu')(convnet_output)
     convnet_output = Lambda(lambda x: K.l2_normalize(x, axis=1))(convnet_output)
 
-    first_input = Input(shape=(224, 224, 3))
-    second_input = Input(shape=(224, 224, 3))
-
-    final_model = tf.keras.models.Model(inputs=[first_input, second_input, vgg_model.input], outputs=convnet_output)
+    final_model = tf.keras.models.Model(inputs=vgg_model.input, outputs=convnet_output)
 
     return final_model
 
@@ -283,10 +272,7 @@ def Mildnet_vgg16_skip_1():
     convnet_output = Dense(2048, activation='relu')(convnet_output)
     convnet_output = Lambda(lambda x: K.l2_normalize(x, axis=1))(convnet_output)
 
-    first_input = Input(shape=(224, 224, 3))
-    second_input = Input(shape=(224, 224, 3))
-
-    final_model = tf.keras.models.Model(inputs=[first_input, second_input, vgg_model.input], outputs=convnet_output)
+    final_model = tf.keras.models.Model(inputs=vgg_model.input, outputs=convnet_output)
 
     return final_model
 
@@ -308,10 +294,7 @@ def Mildnet_vgg16_skip_2():
     convnet_output = Dense(2048, activation='relu')(convnet_output)
     convnet_output = Lambda(lambda x: K.l2_normalize(x, axis=1))(convnet_output)
 
-    first_input = Input(shape=(224, 224, 3))
-    second_input = Input(shape=(224, 224, 3))
-
-    final_model = tf.keras.models.Model(inputs=[first_input, second_input, vgg_model.input], outputs=convnet_output)
+    final_model = tf.keras.models.Model(inputs=vgg_model.input, outputs=convnet_output)
 
     return final_model
 
@@ -333,10 +316,7 @@ def Mildnet_vgg16_skip_3():
     convnet_output = Dense(2048, activation='relu')(convnet_output)
     convnet_output = Lambda(lambda x: K.l2_normalize(x, axis=1))(convnet_output)
 
-    first_input = Input(shape=(224, 224, 3))
-    second_input = Input(shape=(224, 224, 3))
-
-    final_model = tf.keras.models.Model(inputs=[first_input, second_input, vgg_model.input], outputs=convnet_output)
+    final_model = tf.keras.models.Model(inputs=vgg_model.input, outputs=convnet_output)
 
     return final_model
 
@@ -352,10 +332,7 @@ def Mildnet_vgg16_skip_4():
     convnet_output = Dense(2048, activation='relu')(convnet_output)
     convnet_output = Lambda(lambda x: K.l2_normalize(x, axis=1))(convnet_output)
 
-    first_input = Input(shape=(224, 224, 3))
-    second_input = Input(shape=(224, 224, 3))
-
-    final_model = tf.keras.models.Model(inputs=[first_input, second_input, vgg_model.input], outputs=convnet_output)
+    final_model = tf.keras.models.Model(inputs=vgg_model.input, outputs=convnet_output)
 
     return final_model
 
@@ -369,16 +346,14 @@ def ranknet():
     convnet_output = Dropout(0.5)(convnet_output)
     convnet_output = Lambda(lambda x: K.l2_normalize(x, axis=1))(convnet_output)
 
-    s1_inp = Input(shape=(224, 224, 3))
-    s1 = MaxPool2D(pool_size=(4, 4), strides=(4, 4), padding='valid')(s1_inp)
+    s1 = MaxPool2D(pool_size=(4, 4), strides=(4, 4), padding='valid')(vgg_model.input)
     s1 = ZeroPadding2D(padding=(4, 4), data_format=None)(s1)
     s1 = Conv2D(96, kernel_size=(8, 8), strides=(4, 4), padding='valid')(s1)
     s1 = ZeroPadding2D(padding=(2, 2), data_format=None)(s1)
     s1 = MaxPool2D(pool_size=(7, 7), strides=(4, 4), padding='valid')(s1)
     s1 = Flatten()(s1)
 
-    s2_inp = Input(shape=(224, 224, 3))
-    s2 = MaxPool2D(pool_size=(8, 8), strides=(8, 8), padding='valid')(s2_inp)
+    s2 = MaxPool2D(pool_size=(8, 8), strides=(8, 8), padding='valid')(vgg_model.input)
     s2 = ZeroPadding2D(padding=(4, 4), data_format=None)(s2)
     s2 = Conv2D(96, kernel_size=(8, 8), strides=(4, 4), padding='valid')(s2)
     s2 = ZeroPadding2D(padding=(1, 1), data_format=None)(s2)
@@ -391,7 +366,7 @@ def ranknet():
     emb = Dense(4096)(merge_two)
     l2_norm_final = Lambda(lambda x: K.l2_normalize(x, axis=1))(emb)
 
-    final_model = tf.keras.models.Model(inputs=[s1_inp, s2_inp, vgg_model.input], outputs=l2_norm_final)
+    final_model = tf.keras.models.Model(inputs=vgg_model.input, outputs=l2_norm_final)
 
     return final_model
 
@@ -442,8 +417,7 @@ def visnet_lrn2d_model():
     convnet_output = Dropout(0.6)(convnet_output)
     convnet_output = Lambda(lambda x: K.l2_normalize(x, axis=1))(convnet_output)
 
-    first_input = Input(shape=(224, 224, 3))
-    first_maxpool = MaxPooling2D(pool_size=4, strides=4)(first_input)
+    first_maxpool = MaxPooling2D(pool_size=4, strides=4)(vgg_model.input)
     first_conv = Conv2D(96, kernel_size=8, strides=4, activation='relu')(first_maxpool)
     first_lrn2d = LRN2D(n=5)(first_conv)
     first_zero_padding = ZeroPadding2D(padding=(3, 3))(first_lrn2d)
@@ -451,8 +425,7 @@ def visnet_lrn2d_model():
     first_maxpool2 = Flatten()(first_maxpool2)
     first_maxpool2 = Lambda(lambda x: K.l2_normalize(x, axis=1))(first_maxpool2)
 
-    second_input = Input(shape=(224, 224, 3))
-    second_maxpool = MaxPooling2D(pool_size=8, strides=8)(second_input)
+    second_maxpool = MaxPooling2D(pool_size=8, strides=8)(vgg_model.input)
     second_conv = Conv2D(96, kernel_size=8, strides=4, activation='relu')(second_maxpool)
     second_lrn2d = LRN2D(n=5)(second_conv)
     second_zero_padding = ZeroPadding2D(padding=(1, 1))(second_lrn2d)
@@ -465,7 +438,7 @@ def visnet_lrn2d_model():
     emb = Dense(4096)(merge_two)
     l2_norm_final = Lambda(lambda x: K.l2_normalize(x, axis=1))(emb)
 
-    final_model = Model(inputs=[first_input, second_input, vgg_model.input], outputs=l2_norm_final)
+    final_model = Model(inputs=vgg_model.input, outputs=l2_norm_final)
 
     return final_model
 
@@ -479,14 +452,12 @@ def visnet_model():
     convnet_output = Dropout(0.6)(convnet_output)
     convnet_output = Lambda(lambda x: K.l2_normalize(x, axis=1))(convnet_output)
 
-    first_input = Input(shape=(224, 224, 3))
-    first_conv = Conv2D(96, kernel_size=(8, 8), strides=(16, 16), padding='same')(first_input)
+    first_conv = Conv2D(96, kernel_size=(8, 8), strides=(16, 16), padding='same')(vgg_model.input)
     first_max = MaxPool2D(pool_size=(3, 3), strides=(4, 4), padding='same')(first_conv)
     first_max = Flatten()(first_max)
     first_max = Lambda(lambda x: K.l2_normalize(x, axis=1))(first_max)
 
-    second_input = Input(shape=(224, 224, 3))
-    second_conv = Conv2D(96, kernel_size=(8, 8), strides=(32, 32), padding='same')(second_input)
+    second_conv = Conv2D(96, kernel_size=(8, 8), strides=(32, 32), padding='same')(vgg_model.input)
     second_max = MaxPool2D(pool_size=(7, 7), strides=(2, 2), padding='same')(second_conv)
     second_max = Flatten()(second_max)
     second_max = Lambda(lambda x: K.l2_normalize(x, axis=1))(second_max)
@@ -495,57 +466,56 @@ def visnet_model():
     merge_two = concatenate([merge_one, convnet_output], axis=1)
     emb = Dense(4096)(merge_two)
     l2_norm_final = Lambda(lambda x: K.l2_normalize(x, axis=1))(emb)
-    final_model = tf.keras.models.Model(inputs=[first_input, second_input, vgg_model.input], outputs=l2_norm_final)
+    final_model = tf.keras.models.Model(inputs=vgg_model.input, outputs=l2_norm_final)
 
     return final_model
 
-
-def alexnet():
-    if not os.path.exists("alexnet_keras.zip"):
-        print("Downloading Alexnet Keras Helpers")
-        with file_io.FileIO("gs://fynd-open-source/research/MildNet/alexnet_keras.zip", mode='r') as alexnet_keras:
-            with file_io.FileIO("alexnet_keras.zip", mode='w+') as output_f:
-                output_f.write(alexnet_keras.read())
-        dest_path = "/root/.local/lib/python2.7/site-packages/trainer"
-        with zipfile.ZipFile("alexnet_keras.zip", 'r') as zip_ref:
-            zip_ref.extractall(dest_path)
-            import shutil
-            for f in os.listdir("{}/alexnet_keras/".format(dest_path)):
-                shutil.copy("{}/alexnet_keras/{}".format(dest_path, f), "{}/{}".format(dest_path, f))
-                shutil.copy("{}/alexnet_keras/{}".format(dest_path, f), "{}/{}".format("/user_dir", f))
-
-    os.popen("pip install keras==2.0.4").read()
-    from convnets import convnet
-
-    alexnet_model = convnet('alexnet', weights_path="alexnet_weights.h5", heatmap=False)
-    convnet_output = GlobalAveragePooling2D()(alexnet_model.get_layer('convpool_5').output)
-    convnet_output = Dense(4096, activation='relu')(convnet_output)
-    convnet_output = Dropout(0.6)(convnet_output)
-    convnet_output = Dense(4096, activation='relu')(convnet_output)
-    convnet_output = Dropout(0.6)(convnet_output)
-    convnet_output = Lambda(lambda x: K.l2_normalize(x, axis=1))(convnet_output)
-
-    first_input = Input(shape=(3, 227, 227))
-    first_maxpool = MaxPooling2D(pool_size=4, strides=4)(first_input)
-    first_conv = Conv2D(96, kernel_size=8, strides=4, activation='relu')(first_maxpool)
-    first_zero_padding = ZeroPadding2D(padding=(3, 3))(first_conv)
-    first_maxpool2 = MaxPooling2D(pool_size=7, strides=4, padding='same')(first_zero_padding)
-    first_maxpool2 = Flatten()(first_maxpool2)
-    first_maxpool2 = Lambda(lambda x: K.l2_normalize(x, axis=1))(first_maxpool2)
-
-    second_input = Input(shape=(3, 227, 227))
-    second_maxpool = MaxPooling2D(pool_size=8, strides=8)(second_input)
-    second_conv = Conv2D(96, kernel_size=8, strides=4, activation='relu')(second_maxpool)
-    second_zero_padding = ZeroPadding2D(padding=(1, 1))(second_conv)
-    second_maxpool2 = MaxPooling2D(pool_size=3, strides=2, padding='same')(second_zero_padding)
-    second_maxpool2 = Flatten()(second_maxpool2)
-    second_maxpool2 = Lambda(lambda x: K.l2_normalize(x, axis=1))(second_maxpool2)
-
-    merge_one = concatenate([first_maxpool2, second_maxpool2])
-    merge_two = concatenate([merge_one, convnet_output])
-    emb = Dense(4096)(merge_two)
-    l2_norm_final = Lambda(lambda x: K.l2_normalize(x, axis=1))(emb)
-
-    final_model = Model(inputs=[first_input, second_input, alexnet_model.input], outputs=l2_norm_final)
-
-    return final_model
+# def alexnet():
+#     if not os.path.exists("alexnet_keras.zip"):
+#         print("Downloading Alexnet Keras Helpers")
+#         with file_io.FileIO("gs://fynd-open-source/research/MildNet/alexnet_keras.zip", mode='r') as alexnet_keras:
+#             with file_io.FileIO("alexnet_keras.zip", mode='w+') as output_f:
+#                 output_f.write(alexnet_keras.read())
+#         dest_path = "/root/.local/lib/python2.7/site-packages/trainer"
+#         with zipfile.ZipFile("alexnet_keras.zip", 'r') as zip_ref:
+#             zip_ref.extractall(dest_path)
+#             import shutil
+#             for f in os.listdir("{}/alexnet_keras/".format(dest_path)):
+#                 shutil.copy("{}/alexnet_keras/{}".format(dest_path, f), "{}/{}".format(dest_path, f))
+#                 shutil.copy("{}/alexnet_keras/{}".format(dest_path, f), "{}/{}".format("/user_dir", f))
+#
+#     os.popen("pip install keras==2.0.4").read()
+#     from convnets import convnet
+#
+#     alexnet_model = convnet('alexnet', weights_path="alexnet_weights.h5", heatmap=False)
+#     convnet_output = GlobalAveragePooling2D()(alexnet_model.get_layer('convpool_5').output)
+#     convnet_output = Dense(4096, activation='relu')(convnet_output)
+#     convnet_output = Dropout(0.6)(convnet_output)
+#     convnet_output = Dense(4096, activation='relu')(convnet_output)
+#     convnet_output = Dropout(0.6)(convnet_output)
+#     convnet_output = Lambda(lambda x: K.l2_normalize(x, axis=1))(convnet_output)
+#
+#     first_input = Input(shape=(3, 227, 227))
+#     first_maxpool = MaxPooling2D(pool_size=4, strides=4)(first_input)
+#     first_conv = Conv2D(96, kernel_size=8, strides=4, activation='relu')(first_maxpool)
+#     first_zero_padding = ZeroPadding2D(padding=(3, 3))(first_conv)
+#     first_maxpool2 = MaxPooling2D(pool_size=7, strides=4, padding='same')(first_zero_padding)
+#     first_maxpool2 = Flatten()(first_maxpool2)
+#     first_maxpool2 = Lambda(lambda x: K.l2_normalize(x, axis=1))(first_maxpool2)
+#
+#     second_input = Input(shape=(3, 227, 227))
+#     second_maxpool = MaxPooling2D(pool_size=8, strides=8)(second_input)
+#     second_conv = Conv2D(96, kernel_size=8, strides=4, activation='relu')(second_maxpool)
+#     second_zero_padding = ZeroPadding2D(padding=(1, 1))(second_conv)
+#     second_maxpool2 = MaxPooling2D(pool_size=3, strides=2, padding='same')(second_zero_padding)
+#     second_maxpool2 = Flatten()(second_maxpool2)
+#     second_maxpool2 = Lambda(lambda x: K.l2_normalize(x, axis=1))(second_maxpool2)
+#
+#     merge_one = concatenate([first_maxpool2, second_maxpool2])
+#     merge_two = concatenate([merge_one, convnet_output])
+#     emb = Dense(4096)(merge_two)
+#     l2_norm_final = Lambda(lambda x: K.l2_normalize(x, axis=1))(emb)
+#
+#     final_model = Model(inputs=alexnet_model.input, outputs=l2_norm_final)
+#
+#     return final_model
