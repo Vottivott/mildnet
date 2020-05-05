@@ -60,6 +60,8 @@ def _list_valid_filenames_in_directory(directory, white_list_formats,
         filenames = []
         for triplet in triplets:
             triplet = triplet.split(',')
+            for i in range(len(triplet)): # HANNES FIX
+                triplet[i] = triplet[i].replace('\r','')
             if len(triplet) != 3:
                 continue
             filenames += triplet
@@ -71,8 +73,18 @@ def _list_valid_filenames_in_directory(directory, white_list_formats,
     filenames = []
     subdir = os.path.basename(directory)
     basedir = os.path.dirname(directory)
+    debug = subdir == "q" and False
+    if debug:
+        print("directory: " + directory)
+        print("subdir: " + subdir)
+        print("basedir: " + basedir)
     for root, _, files in _recursive_list(directory):
-        for fname in files:
+        if debug:
+            print(files)
+        for i,fname in enumerate(files):
+            if debug:
+                print(i)
+                print("- %s" % fname)
             is_valid = False
             for extension in white_list_formats:
                 if fname.lower().endswith('.' + extension):
@@ -83,6 +95,10 @@ def _list_valid_filenames_in_directory(directory, white_list_formats,
                 filenames.append(fname)
             else:
                 logging.warning(fname + " is not valid")
+                if debug:
+                    print(i)
+                    print("-- %s" % fname)
+                    print(" is not valid!")
     return ["q", "p", "n"], filenames
 
 
